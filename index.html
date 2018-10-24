@@ -1,0 +1,304 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Analytics Pipeline</title>
+  <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../elements/codelab.html">
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <style is="custom-style">
+    body {
+      font-family: "Roboto",sans-serif;
+      background: var(--google-codelab-background, #F8F9FA);
+    }
+  </style>
+  
+</head>
+<body unresolved class="fullbleed">
+
+  <google-codelab title="Analytics Pipeline"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Introduction" duration="0">
+        <p>In this series of labs, you will go through the full  analytics life cycle of  taking data through the {Ingest → Store → Transform → Analyse}  life cycle. We will do this using our own GCP accounts.</p>
+<aside class="warning"><p>Till now We have done Analytics on GCP in the Qwiklabs environment. In here, we will start doing Analytics directly on GCP using our own GCP accounts.   The implication for us is that we will need to take care of some additional housekeeping, that the Qwiklabs environment took care of, for us.</p>
+</aside>
+<h2><strong>What you&#39;ll build</strong></h2>
+<ul>
+<li>A full life cycle Analytics Project</li>
+<li>Ingest → Transform → Store → Analyze</li>
+</ul>
+<p><br>In this project, we will use Detroit area 9-1-1 calls as our data set, available from the Detroit Police Department. The objective is. This is a large data set with over a million rows. Big data sets can be much larger, easily running into Billions of records. The steps and tools we follow in this series of labs will enable us to do this even if the records run into the billions. The GCP tools we will be using are: Cloud Storage, Data prep, BigQuery, and DataStudio. </p>
+<h2 class="checklist"><strong>What you&#39;ll learn</strong></h2>
+<ul class="checklist">
+<li>Ingest, handle, transform and move Big Data in GCP</li>
+<li>Cloud Storage, Data prep, BigQuery, and DataStudio. </li>
+</ul>
+<h2><strong>What you&#39;ll need</strong></h2>
+<ul>
+<li>A recent version of <a href="https://www.google.com/chrome/" target="_blank">Chrome</a>. Note, this works in other browsers as well, but this case is built using chrome.</li>
+<li>Enrolled in the free Google GCP credits.</li>
+<li>Preferably Enrolled using a Gmail ID.</li>
+<li>Reasonably fast and stable internet connection</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Log into Google Cloud Console" duration="0">
+        <p>We will start off by logging into the Google Console. </p>
+<h2><strong>Log in to Google Cloud Console</strong></h2>
+<p>Type in console.cloud.google.com in your browser.</p>
+<p>Log in using the email account with which you signed up for free GCP trial credits.</p>
+<p><img style="max-width: 624.00px" src="img/8f35c83411e51ff5.png"></p>
+<p>Click on <strong>Next</strong>.</p>
+<p>Google Cloud Console shows up as below:</p>
+<p><img style="max-width: 624.00px" src="img/a0a2ea19aa23804.png"></p>
+<p>Ensure you are logged in with the correct account by clicking on user icon on top right.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create a GCP Project" duration="0">
+        <p>The first step in any Google Cloud project is to create a gcp project. </p>
+<h2><strong>Create a GCP Project</strong></h2>
+<p>Click on Projects dropdown next to &#34;Google Cloud Platform&#34; and you will get a list of projects currently existing in your account.</p>
+<p><img style="max-width: 624.00px" src="img/c79fdb5b01e23b73.png"></p>
+<p>Follow instructions in next few steps to create a new project &#34;Detroit911&#34;.</p>
+<p><img style="max-width: 624.00px" src="img/1f753589d8e51314.png"></p>
+<p><img style="max-width: 573.00px" src="img/cbb99e5d1e361491.png"></p>
+<p><img style="max-width: 624.00px" src="img/85e1e4d5702ff223.png"></p>
+<p><img style="max-width: 624.00px" src="img/8ae4904bba3ea5cc.png"></p>
+<p>You now have a new project titled Detroit911 created under your GCP account.</p>
+<p>Now, click on the Project&#39;s drop down on the top next to &#34;Google Cloud platform&#34; to select the new project &#34;Detroit911&#34; that you just created. </p>
+<p>Make sure you select this new project. If successfully selected, its name will show up in the projects dropdown as shown in screen-shot below.</p>
+<p><img style="max-width: 624.00px" src="img/cc14636e2ee58a60.png"></p>
+<aside class="warning"><p>It is essential to ensure that the correct project is always selected. All resources are created and used inside a project and all work is saved under a project. </p>
+</aside>
+<p>That&#39;s it! Your new Google Cloud Project is ready. You can now start adding the needed GCP services (Lego blocks) to this project.</p>
+<p>In the next lab, we will start off by ingesting our data into the GCP platform.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Ingest Data (Cloud Storage)" duration="0">
+        <p>There are many different services that allow you to store data into GCP. We will  start by ingesting our data into Google Cloud Storage as it is one of the cheapest options.</p>
+<h2><strong>Create a Storage Bucket on Google Cloud Storage</strong></h2>
+<p>In the Console, go to <strong>Navigation menu &gt; Storage &gt; Browser</strong>. Then click <strong>Create Bucket</strong>:</p>
+<p><img alt="create-bucket.png" style="max-width: 474.00px" src="img/d3c3748473fca67d.png"></p>
+<p><strong>Name:</strong> Enter a unique name for your bucket.</p>
+<p><strong>Bucket naming rules:</strong></p>
+<ul>
+<li>Do not include sensitive information in the bucket name, because the bucket namespace is global and publicly visible.</li>
+<li>Bucket names must contain only lowercase letters, numbers, dashes (-), underscores (_), and dots (.). Names containing dots require <a href="https://cloud.google.com/storage/docs/domain-name-verification" target="_blank">verification</a>.</li>
+<li>Bucket names must start and end with a number or letter.</li>
+<li>Bucket names must contain 3 to 63 characters. Names containing dots can contain up to 222 characters, but each dot-separated component can be no longer than 63 characters.</li>
+<li>Bucket names cannot be represented as an IP address in dotted-decimal notation (for example, 192.168.5.4).</li>
+<li>Bucket names cannot begin with the &#34;goog&#34; prefix.</li>
+<li>Bucket names cannot contain &#34;google&#34; or close misspellings of &#34;google&#34;.</li>
+<li>Also, for DNS compliance and future compatibility, you should not use underscores (_) or have a period adjacent to another period or dash. For example, &#34;..&#34; or &#34;-.&#34; or &#34;.-&#34; are not valid in DNS names.</li>
+</ul>
+<p><strong>Storage class:</strong> Regional </p>
+<p><strong>Location:</strong> Uscentral1</p>
+<p>Once you&#39;ve gotten your bucket configured, click <strong>Create</strong>:</p>
+<p>,<img style="max-width: 624.00px" src="img/e956544b6e9220eb.png"></p>
+<p><img style="max-width: 624.00px" src="img/149158cb341a3cd1.png"></p>
+<p><img style="max-width: 624.00px" src="img/1718ddbe5a2e834b.png"></p>
+<p><img style="max-width: 624.00px" src="img/667cfa8274a3fdbf.png"></p>
+<h2><strong>Download data on a local computer</strong></h2>
+<p>Download this CSV file which contains Detroit 911 data and store it locally on your computer.  <a href="http://bit.ly/2EyXRsE" target="_blank"><paper-button class="colored" raised><iron-icon icon="file-download"></iron-icon>Download DPD 911 data</paper-button></a></p>
+<p>The file is large in size and will take some time to download.</p>
+<h2><strong>Ingest Data into Google Cloud Storage Bucket</strong></h2>
+<p>Drag and drop this file from your computer into the cloud storage bucket.<img style="max-width: 624.00px" src="img/453f4c1895f249b1.png"></p>
+<p><img style="max-width: 624.00px" src="img/d9957cdb472d166.png"></p>
+<p>That&#39;s it — you&#39;ve just moved your data file from local computer and stored it in the cloud in a Cloud Storage bucket!</p>
+<p>Now that you have ingested data into GCP, we will transform it using Data Prep.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Transform Data (Data Prep)" duration="0">
+        <p>In this lab, we will use Data Prep to clean up and transform the data and prepare it for analysis.</p>
+<h2><strong>Start Cloud Data Prep</strong></h2>
+<p><img style="max-width: 624.00px" src="img/950925339eeffa25.png"></p>
+<p><img style="max-width: 427.00px" src="img/6cb7c4f87c6abfd9.png"></p>
+<p><img style="max-width: 427.00px" src="img/bb9a1eacc6c87c0c.png"></p>
+<p>This step might take some time to complete.</p>
+<p><img style="max-width: 624.00px" src="img/951fec30c1c88752.png"></p>
+<p><img style="max-width: 624.00px" src="img/c4392124ebf246f2.png"></p>
+<h2><strong>Create a New Data Flow</strong></h2>
+<p><img style="max-width: 620.00px" src="img/6880ae5b955a0ca2.png"></p>
+<p><img style="max-width: 624.00px" src="img/c7ca2a5d520186f.png"></p>
+<h2><strong>Add a Source Data Set to Flow</strong></h2>
+<p>Click on Import &amp; Add Datasets <img style="max-width: 624.00px" src="img/b8d7667299af6366.png"></p>
+<p>Select <strong>GCS</strong> → Click on bucket: <strong>dpd911data</strong> → Select the csv file you had stored in the previous lab.</p>
+<p><img style="max-width: 624.00px" src="img/3db1ddcdeac843a0.png"></p>
+<p>A preview of the new data set is displayed → Click on <strong>Import and Add to Flow</strong>.</p>
+<p><img style="max-width: 624.00px" src="img/5bf95d7d77eb0070.png"></p>
+<p>A Dataflow with the csv file as source data is displayed. Details of data is also displayed in the Details pane on right.</p>
+<p><img style="max-width: 624.00px" src="img/90be595ae2d62bdc.png"></p>
+<h2><strong>Add Recipes to Transform Data</strong></h2>
+<p>Click on <strong>Add Recipe</strong> → Change name to <strong>FormatColumnNames</strong> → <strong>Edit Recipe</strong>.</p>
+<p><img style="max-width: 624.00px" src="img/61d266978b463ac.png"></p>
+<p>Csv files need to follow certain conventions including no spaces in column names. We will do that for all the columns of this file in some of the following steps.</p>
+<p>Click on drop down next to first column - Incident ID → Preview mode comes up with name changed to newColumnName1.</p>
+<p>In right pane replace newColumnName1 with incidentID.</p>
+<p><img style="max-width: 624.00px" src="img/e1c16a4960def048.png"></p>
+<p>The column is renamed. A step is added in your recipe ‘FormatColumnNames&#39;</p>
+<h2><strong>Add Multiple Steps to Recipe</strong></h2>
+<p>Click on <strong>New Step</strong> and continue to rename all the column names as shown below.</p>
+<p><img style="max-width: 624.00px" src="img/8709b040a8779c26.png"></p>
+<p><img style="max-width: 451.00px" src="img/6b607198bd04cd48.png"></p>
+<p>You have now renamed all column names. Now we will add some steps to extract the Year, Month, Day of Week and Day of Month from the incident date and time which is stored in the field callTime.</p>
+<p><img style="max-width: 624.00px" src="img/2285173f195aec3b.png"></p>
+<p><img style="max-width: 466.00px" src="img/3f05320df490c299.png"></p>
+<p><img style="max-width: 624.00px" src="img/690c269746b57252.png"></p>
+<p><img style="max-width: 624.00px" src="img/d384de770e0fb53b.png"></p>
+<p><img style="max-width: 624.00px" src="img/86a6556884b635a2.png"></p>
+<p><img style="max-width: 624.00px" src="img/6ff9758d442d44ce.png"></p>
+<p><img style="max-width: 432.00px" src="img/926dcf02f5a0b76a.png"></p>
+<p>In the next few steps we change the format of the callTime  and timeOfCall fields.</p>
+<p><img style="max-width: 624.00px" src="img/3d70ac1ce0f1a8c6.png"></p>
+<p><img style="max-width: 624.00px" src="img/f2569b30995d98c9.png"></p>
+<p><img style="max-width: 624.00px" src="img/e3044807625522ed.png"></p>
+<p><img style="max-width: 398.00px" src="img/50a18c5577212a18.png"></p>
+<p><img style="max-width: 624.00px" src="img/cd845f8ef776cd70.png"></p>
+<h2><strong>Run the Recipe</strong></h2>
+<p>Till now we have been simply creating the recipe, not actually transforming the whole data set. The data that has been displayed is a sample and not the full data set.  In a sense, we have been prototyping what we want to do with our data set. In the next step, we run our recipe on our full dataset by clicking on &#34;run job&#34;.</p>
+<p>This job will take some time because our data set is large at around over 1 million rows. In my case, it took around 20 minutes. Let the job run. Once completed, the job status will change from in progress to completed.</p>
+<p><img style="max-width: 624.00px" src="img/a5db69d83ab9a3db.png"></p>
+<p><img style="max-width: 624.00px" src="img/329fce49b5f4885.png"></p>
+<p>You can see a list of jobs by clicking on the job icon on the left-hand menu<img style="max-width: 26.11px" src="img/c707fd3c0f6cf99e.png">.</p>
+<p>The completed job should show up with status completed</p>
+<p><img style="max-width: 55.67px" src="img/87ada382a93eeb3a.png">  </p>
+<p>Click on the job ID<img style="max-width: 91.75px" src="img/c9049520a8e1f0f0.png">, and it will provide a report that details out the different transformations that took place in that job. It also provides lot of additional information. Take some time to review it.</p>
+<p><img style="max-width: 624.00px" src="img/d28b3c07c9ae4cdf.png"></p>
+<p>You will notice that the name against data set is listed as FormatColumnNames. The data is stored as a file in GCS and you can see it by clicking on the <strong>Library</strong> menu item on the left of the screen. <img style="max-width: 54.00px" src="img/b9cd78d86ae4c56c.png"></p>
+<p><img style="max-width: 624.00px" src="img/430965372fa1d8bf.png"></p>
+<p>In the next lab, we will move this transformed data in GCS in csv format into a table in Big Query. Once we have the data in Big Query, we will use Data Studio to visualize and run analytics on this data set.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Store Data (Big Query)" duration="0">
+        <h2><strong>Create a DataSet in Big Query</strong></h2>
+<p>In this step you will create a dataset to hold your data. We need a dataset in BQ to hold data. Datasets help you control access to tables and views in a project. In this example, case we will be creating only one table, yet we still need a Dataset to hold the table.</p>
+<p>In the cloud console, select Big Query. In the Big Query Console, make sure that the correct GCP project - <strong>Detroit911</strong>- is selected.</p>
+<p><img style="max-width: 399.00px" src="img/1aa6593da3d16e5c.png"></p>
+<p>Under the resources tab in left pane, your project ID will be displayed (this might be different than the project name). </p>
+<p><img style="max-width: 330.00px" src="img/717e2d5906a149ae.png"></p>
+<p>Click on your project ID → Click on CREATE DATASET</p>
+<p><img style="max-width: 624.00px" src="img/ba42149706ec9231.png"></p>
+<p>Enter details for data set as below:</p>
+<p><img style="max-width: 518.00px" src="img/884a94459cd602b2.png"></p>
+<p>Now you should see this data set under your project ID in the left pane.</p>
+<p><img style="max-width: 344.00px" src="img/eb5d83a7b0a827da.png"></p>
+<p>That is it. Now, this dataset DPD_911data will serve as a place to hold data that you want to import into BQ from other locations such as GCS.</p>
+<p>In the next step we will do exactly that → Import our 911 call data from GCS into BQ.</p>
+<h2><strong>Load Data from GCS into Big Query</strong></h2>
+<p>In this lab, we move the data from GCS to Google Big Query.</p>
+<p>Go to the flow <strong>DataPrep_911</strong> in DataPrep. Click on three dots under FormatColumnNames  <img style="max-width: 38.71px" src="img/b7c151a7fd17fff8.png">  → Select <strong>Add new Recipe</strong> → Name recipe as <strong>MoveToBQ</strong>.</p>
+<p><img style="max-width: 588.00px" src="img/3a4fee5b590b6574.png"></p>
+<p>Click on Publish link of MoveToBQ recipe.<img style="max-width: 38.50px" src="img/5163d1cd08a65745.png"></p>
+<p><img style="max-width: 519.00px" src="img/85ad3e35d6305206.png"></p>
+<p>The Details pane on right displays the default publishing option which is currently set to create a CSV file in Google Cloud storage, titled MoveToBQ.csv. We want to change that to move this to publish it as a table in Big Query.</p>
+<p><img style="max-width: 396.00px" src="img/a4008e12f8ca813b.png"></p>
+<p>This brings up publishing settings. Click on pencil icon to edit these settings.</p>
+<p><img style="max-width: 624.00px" src="img/98959f017600b5c2.png"></p>
+<p><img style="max-width: 624.00px" src="img/26f2413623418172.png"></p>
+<p><img style="max-width: 366.00px" src="img/32cba5377e7189ab.png"></p>
+<p><img style="max-width: 326.00px" src="img/227f4d927e5759e2.png"></p>
+<p><img style="max-width: 624.00px" src="img/ed953748abab711b.png"></p>
+<p>Go to Big Query in GCP Console to ensure that the table has been created.</p>
+<p><img style="max-width: 624.00px" src="img/f4d6ff6967d4d9ff.png"></p>
+<p><img style="max-width: 624.00px" src="img/60f2336c4da1d89e.png"></p>
+<p><img style="max-width: 624.00px" src="img/1fba8a24c56f3bb0.png"></p>
+<p>Thus now the data is available in Big Query in table &#34;MoveToBQ&#34;, inside data set &#34;DPD_911data&#34;.</p>
+<p>Till now we have completed importing data, transforming data and storing it in Big Query. In the next step, we will use this data in Big Query to do analytics in Data Studio.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Analyze Data (Data Studio)" duration="0">
+        <h2><strong>Start Data Studio</strong></h2>
+<p>Type in datastudio.google.com in your web browser. </p>
+<p><img style="max-width: 320.00px" src="img/b6d681160611e30.png"></p>
+<h2><strong>Create a New Report in Data Studio</strong></h2>
+<p>Click on Start a New Report.</p>
+<p><img style="max-width: 612.00px" src="img/5a99fb1a666dad4d.png"></p>
+<h2><strong>Add a Data Source to Report</strong></h2>
+<p><img style="max-width: 301.00px" src="img/6acdf439bf5951b3.png"></p>
+<p><img style="max-width: 345.00px" src="img/bcd6d955082abf0.png"></p>
+<p><img style="max-width: 624.00px" src="img/68f076a2b2ac3f10.png"></p>
+<p>This displays all the fields available for reporting for data sources in Big Query.</p>
+<p><img style="max-width: 624.00px" src="img/f5d797ed6bdb7078.png"></p>
+<p><img style="max-width: 450.00px" src="img/649b5da2114d4685.png"></p>
+<p>Click on add to report. This will make all the feels in MoveToBQ dataset available and data studio for reporting.</p>
+<h2><strong>Draw Report on Data Studio Canvas</strong></h2>
+<p>Once you click add to report, a canvas for creating reports and visualizations shows up, as shown below:</p>
+<p><img style="max-width: 624.00px" src="img/c28e6b1a3038d5fe.png"></p>
+<p>This gives us a blank chart with the available fields listed on the right.</p>
+<p><img style="max-width: 624.00px" src="img/d938a853e7ef25f2.png"></p>
+<p><img style="max-width: 624.00px" src="img/7acd022204935ab8.png"></p>
+<h2><strong>Add Dimensions and Metrics to Report</strong></h2>
+<p><img style="max-width: 624.00px" src="img/3b467a8f1a1ccf43.png"></p>
+<p><img style="max-width: 624.00px" src="img/3f9669aed060bc9d.png"></p>
+<p><img style="max-width: 624.00px" src="img/3bb4501486ac2c7d.png"></p>
+<p><img style="max-width: 559.00px" src="img/c680f7b0b63778cc.png"></p>
+<p><img style="max-width: 624.00px" src="img/2f11f1836b27b1ca.png"></p>
+<h2><strong>Play Around with Report Using Data Studio Functionality</strong></h2>
+<p>You can play around with the many different options there are to change the report layouts. You might feel that this is very similar to Excel. Here we must remind ourselves, that this report is running on over a million records. Secondly, this could very easily be several Billion records and still we need to use the same tools and processes. This is the power of running analytics on the cloud.</p>
+<h2><strong>Download Report as PDF</strong></h2>
+<p>You can download a PDF version of the report for printing/sharing and also password protect it if you wish.</p>
+<p><img style="max-width: 260.00px" src="img/e092bc7235bdb37f.png"></p>
+<p><img style="max-width: 281.00px" src="img/2ad563e47655cd21.png"></p>
+<p><img style="max-width: 625.03px" src="img/51090937f969cc48.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Independent Data Science Project Using GCP." duration="0">
+        <p>As a subsequent exercise, we will do a very similar end to end analytics project from raw data to insights using the following tools GCS, DataPrep, BQ and Data Studio.</p>
+<p>However, you will need to do this exercise independently. You can use this series of labs as instructions. You may want to practice these labs a few times to get the hang of the different moves involved in doing an end to end analytics project.</p>
+<p>Best.</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-49880327-14', 'auto');
+
+    (function() {
+      var gaCodelab = '';
+      if (gaCodelab) {
+        ga('create', gaCodelab, 'auto', {name: 'codelab'});
+      }
+
+      var gaView;
+      var parts = location.search.substring(1).split('&');
+      for (var i = 0; i < parts.length; i++) {
+        var param = parts[i].split('=');
+        if (param[0] === 'viewga') {
+          gaView = param[1];
+          break;
+        }
+      }
+      if (gaView && gaView !== gaCodelab) {
+        ga('create', gaView, 'auto', {name: 'view'});
+      }
+    })();
+  </script>
+
+</body>
+</html>
