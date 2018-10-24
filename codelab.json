@@ -1,13 +1,13 @@
 {
   "environment": "web",
-  "source": "1I27xaHjiM0Nd5QY0FC-pDXfVzzNZm-QTYfkcgHG5ldY/edit#heading=h.lk6es2hf6hgo",
+  "source": "1I27xaHjiM0Nd5QY0FC-pDXfVzzNZm-QTYfkcgHG5ldY/edit#heading=h.a604z35rphls",
   "format": "html",
   "prefix": "../../",
   "mainga": "UA-49880327-14",
-  "updated": "2018-10-23T17:58:08Z",
-  "id": "DataScience",
+  "updated": "2018-10-24T04:08:06Z",
+  "id": "",
   "duration": 0,
-  "title": "Analytics Pipeline",
+  "title": "Analytics Full Life Cycle Project",
   "author": "imfundo",
   "summary": "In this series of labs you'll ingest→ Store → Transform → Visualize a Big Data Set.",
   "theme": "web",
@@ -32,5 +32,5 @@
     "typtwd17",
     "web"
   ],
-  "url": "DataScience"
+  "url": ""
 }
