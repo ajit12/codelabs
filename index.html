@@ -7,8 +7,8 @@
   <meta name="theme-color" content="#4F7DC9">
   <meta charset="UTF-8">
   <title>Analytics Full Life Cycle Project</title>
-  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="elements/codelab.html">
+  <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../elements/codelab.html">
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
   <style is="custom-style">
     body {
@@ -200,21 +200,41 @@
 <p><img style="max-width: 344.00px" src="img/eb5d83a7b0a827da.png"></p>
 <p>That is it. Now, this dataset DPD_911data will serve as a place to hold data that you want to import into BQ from other locations such as GCS.</p>
 <p>In the next step we will do exactly that → Import our 911 call data from GCS into BQ.</p>
-<h2><strong>Load Data from GCS into Big Query</strong></h2>
-<p>In this lab, we move the data from GCS to Google Big Query.</p>
+<h2><strong>Create Recipe to UpLoad Data from GCS into Big Query</strong></h2>
+<p>In this step, we move data from GCS to Google Big Query.</p>
 <p>Go to the flow <strong>DataPrep_911</strong> in DataPrep. Click on three dots under FormatColumnNames  <img style="max-width: 38.71px" src="img/b7c151a7fd17fff8.png">  → Select <strong>Add new Recipe</strong> → Name recipe as <strong>MoveToBQ</strong>.</p>
 <p><img style="max-width: 588.00px" src="img/3a4fee5b590b6574.png"></p>
-<p>Click on Publish link of MoveToBQ recipe.<img style="max-width: 38.50px" src="img/5163d1cd08a65745.png"></p>
+<p>In this Recipe we are not doing any transformations. The only thing we want to do is to move the data to Big Query. For that we update the Recipe&#39;s publish action to publish the data to Big Query.</p>
+<h2>Update Publish Action of Recipe to UpLoad Data from GCS into Big Query</h2>
+<p>In this Recipe we are not doing any transformations. The only thing we want to do is to move the data to Big Query. For that we update the Recipe&#39;s publish action to publish the data to Big Query.</p>
+<p>To do that we click on the publish link [<img style="max-width: 44.00px" src="img/2dffec322032aeee.png">] of the MoveToBQ recipe, </p>
 <p><img style="max-width: 519.00px" src="img/85ad3e35d6305206.png"></p>
-<p>The Details pane on right displays the default publishing option which is currently set to create a CSV file in Google Cloud storage, titled MoveToBQ.csv. We want to change that to move this to publish it as a table in Big Query.</p>
+<p>The Details of the publish action are displayed on the right hand pane. The publishing action is set by default to create a csv file (MoveToBQ.csv) in GCS.</p>
+<p>We want to change it instead so that the data gets published as a table in Big Query.</p>
+<p>Thus, we click on <strong>Edit</strong> to edit the data destination of the publishing action MobeToBQ , as shown below:</p>
 <p><img style="max-width: 396.00px" src="img/a4008e12f8ca813b.png"></p>
-<p>This brings up publishing settings. Click on pencil icon to edit these settings.</p>
+<p>This brings up publishing settings. As you can see, the publishing action is ‘create-CSV&#39; ; and it creates this in a file named ‘MoveToBQ.csv&#39;. To make changes to this publishing action, we click on the <strong>pencil icon [</strong><img style="max-width: 30.00px" src="img/9a7efaeaa09327b3.png"><strong>]</strong> to edit these settings.</p>
 <p><img style="max-width: 624.00px" src="img/98959f017600b5c2.png"></p>
+<p>Select <strong>Big Query</strong> as destination → Select <strong>DPD_911data</strong> data set.</p>
 <p><img style="max-width: 624.00px" src="img/26f2413623418172.png"></p>
+<p>Click on <strong>Create a new table</strong> on right hand panel.</p>
 <p><img style="max-width: 366.00px" src="img/32cba5377e7189ab.png"></p>
+<p><strong>Enter</strong> following details for new table to be created in BQ → Click on <strong>Update</strong>.</p>
 <p><img style="max-width: 326.00px" src="img/227f4d927e5759e2.png"></p>
-<p><img style="max-width: 624.00px" src="img/ed953748abab711b.png"></p>
-<p>Go to Big Query in GCP Console to ensure that the table has been created.</p>
+<p>Once the publishing action is updated, Instead of saying create csv, the publishing action should now say Replace-BigQuery.</p>
+<h2>Run Job With New Publish Action to move data into Big Query</h2>
+<p>The previous steps updated the publishing action so that the data instead of being stored in a CSV file in GCS, is now to be pushed into a table in Big Query.</p>
+<p>We now need to actually run this job for this new publishing action to actually create the data in Big Query.</p>
+<p>For this , simply click on the Flows icon [<img style="max-width: 36.00px" src="img/ecda8d36f7feab3e.png">] on left to bring up the DataPrep flow. Next hover over Publishing Action Icon  [<img style="max-width: 44.00px" src="img/2dffec322032aeee.png">]  of MoveToBQ step. This will bring up three horizontal dots<img style="max-width: 56.00px" src="img/71158772836de63e.png">. Click on the three dots and Select Run Job.</p>
+<p><img style="max-width: 624.00px" src="img/8fddc167163ad95f.png"></p>
+<p>Once this publishing action job is completed, then the table, MoveToBQ, should get created in Big Query in the BQ data set - DPD911_data. </p>
+<h2><strong>Check for Table Creation in BQ in Job Report</strong></h2>
+<p>One place where you could see whether the data was created in BQ is to look at the detailed report of the job that you just ran. For that, click on the <strong>Jobs menu icon</strong> [ <img style="max-width: 32.00px" src="img/66c498b3dd55af62.png">] on the left hand. This brings up list of recent jobs. Click on the job number of MoveToBQ (in this case it is 921581). This will bring up the Jobs report as below:</p>
+<p><img style="max-width: 624.00px" src="img/5ae1bae44b2d9eac.png"></p>
+<p>If you look carefully on top right corner of report, you will notice that MoveToBQ has been created in BigQuery.</p>
+<p><img style="max-width: 624.00px" src="img/68aa5825622cf0df.png"></p>
+<p>Let&#39;s now go in BQ and ensure that the table has been created there.</p>
+<h2>Check for Table in Big Query</h2>
 <p><img style="max-width: 624.00px" src="img/f4d6ff6967d4d9ff.png"></p>
 <p><img style="max-width: 624.00px" src="img/60f2336c4da1d89e.png"></p>
 <p><img style="max-width: 624.00px" src="img/1fba8a24c56f3bb0.png"></p>
